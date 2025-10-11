@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Sopa de Letras Interactiva - IA y Programación</title>
+    <link type="text/css" href="./Ejercicio 2_files/ardoraSopa.css" rel="stylesheet">
+    <script language="javascript" type="text/javascript" src="./Ejercicio 2_files/jquery.js.descarga"></script>
+    <script language="javascript" type="text/javascript" src="./Ejercicio 2_files/jquery-ui.min.js.descarga"></script>
+    <script language="javascript" type="text/javascript" src="./Ejercicio 2_files/jquery.ui.touch-punch.min.js.descarga"></script>
+    <script language="javascript" type="text/javascript" src="./Ejercicio 2_files/ardoraSopaCFG.js.descarga"></script>
+    <script language="javascript" type="text/javascript" src="./Ejercicio 2_files/ardoraScorm.js.descarga"></script>
+    <script language="javascript" type="text/javascript" src="./Ejercicio 2_files/ardoraSopa.js.descarga"></script>
+    <script language="javascript" type="text/javascript" src="./Ejercicio 2_files/ardoraTab.js.descarga"></script>
+    
+    <style>
+        /* Estilos generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: rgb(184, 184, 184);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #ardoraMain {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #ardoraMain::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, #FF8000, #91962F, #2575fc);
+        }
+        
+        .theme-title {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: 800;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .theme-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, #FF8000, #91962F);
+            border-radius: 3px;
+        }
+        
+        .theme-subtitle {
+            color: #2575fc;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        #ardoraEnu {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            border-left: 6px solid #FF8000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        #ardoraEnu span {
+            font-size: 18px;
+            color: #2c3e50;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        
+        #ardoraAct {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            margin: 0 auto;
+            position: relative;
+            border: 3px solid #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        #ardoraAct:hover {
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        #ardoraActBoard, #ardoraActSel, #ardoraActCanvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        #s_pointer {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        #ardoraActSVG {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        #ardoraActSVG rect:first-child {
+            fill: #91962F;
+            fill-opacity: 0.95;
+        }
+        
+        #ardoraActSVG g rect:first-child {
+            fill: #FFFDFD;
+            filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.25));
+            transition: all 0.3s ease;
+        }
+        
+        #ardoraActSVG g rect:first-child:hover {
+            fill: #FF8000;
+            transform: translateY(-2px);
+            cursor: pointer;
+        }
+        
+        #ardoraActSVG text {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 22px;
+            font-weight: bold;
+            fill: #333;
+            transition: all 0.3s ease;
+        }
+        
+        #ardoraActSVG g rect:first-child:hover + text {
+            fill: white;
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(to right, #f1f8ff, #e3f2fd);
+            border-radius: 15px;
+            border-left: 6px solid #4dabf7;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #1864ab;
+            font-size: 22px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #a5d8ff;
+        }
+        
+        .instructions ul {
+            padding-left: 25px;
+            margin-bottom: 0;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .instructions li::marker {
+            color: #4dabf7;
+        }
+        
+        #ardoraAutor {
+            margin-top: 25px;
+            text-align: center;
+            font-style: italic;
+            color: #6c757d;
+            padding: 15px;
+            border-top: 2px solid #dee2e6;
+            width: 100%;
+            max-width: 900px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+        }
+        
+        #ardoraAutor p {
+            font-size: 16px;
+            margin: 0;
+        }
+        
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .word-item {
+            background: linear-gradient(to right, #91962F, #FF8000);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            #ardoraMain {
+                padding: 20px;
+            }
+            
+            #ardoraAct {
+                height: 350px;
+            }
+            
+            .theme-title {
+                font-size: 26px;
+            }
+            
+            .theme-subtitle {
+                font-size: 18px;
+            }
+            
+            .instructions {
+                padding: 15px;
+            }
+            
+            .word-list {
+                gap: 10px;
+            }
+            
+            .word-item {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body onload="loadPage()" onbeforeunload="unloadPage()" onunload="unloadPage()">
+    <div id="ardoraMain">
+        <h1 class="theme-title">Sopa de Letras Interactiva</h1>
+        <h2 class="theme-subtitle">Conceptos de Inteligencia Artificial y Programación</h2>
+        
+        <div id="ardoraEnu">
+            <span>Encuentra las palabras ocultas relacionadas con IA y programación. ¡Pon a prueba tus conocimientos!</span>
+        </div>
+        
+
+        <div id="ardoraAct">
+            <canvas id="ardoraActBoard" width="385" height="220"></canvas>
+            <canvas id="ardoraActSel" width="385" height="220" tabindex="0"></canvas>
+            <svg id="s_pointer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="385" height="220" style="display: none; position: absolute; z-index: 50; top: 0px; left: 0px;">
+                <line id="vertical" x1="0" y1="0" x2="0" y2="220" style="stroke:rgb(255,0,0);stroke-width:1"></line>
+                <line id="horizontal" x1="0" y1="0" x2="385" y2="0" style="stroke:rgb(255,0,0);stroke-width:1"></line>
+                <circle id="c_point" cx="0" cy="0" r="5" style="opacity:0.1;stroke:rgb(255,0,0);stroke-width:2"></circle>
+            </svg>
+            <canvas id="ardoraActCanvas" width="385.284" height="220"></canvas>
+            <svg id="ardoraActSVG" width="100%" height="100%" style="position: absolute; top: 0px; left: 0px; z-index: 5; visibility: visible; cursor: pointer;" tabindex="0">
+                <rect x="0" y="0" width="405.2840881347656" height="219.99998474121094" fill="#91962F" fill-opacity="0.98"></rect>
+                <rect x="5" y="5" width="395.2840881347656" height="209.99998474121094" fill="none" stroke="#FF8000" stroke-width="2"></rect>
+                <g>
+                    <rect x="135.6420440673828" y="92.49999237060547" width="134" height="35" rx="5" ry="5" fill="#FFFDFD" style="filter: drop-shadow(rgba(136, 136, 136, 0.5) 6px 6px 4px);"></rect>
+                    <rect x="135.6420440673828" y="92.49999237060547" width="134" height="35" rx="5" ry="5" fill="none" stroke="#000000" stroke-width="2"></rect>
+                </g>
+                <text x="154.0895767211914" y="117.49999237060547" font-family="Verdana, Geneva, sans-serif" font-size="19px" fill="#000000">Comenzar</text>
+            </svg>
+        </div>
+        
+        <div class="word-list">
+            <div class="word-item">Chatgpt</div>
+            <div class="word-item">ALGORITMO</div>
+            <div class="word-item">Codigo</div>
+            <div class="word-item">Variable</div>
+            <div class="word-item">Funcion</div>
+            <div class="word-item">Artificial</div>
+            <div class="word-item">Programacion</div>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instrucciones:</h3>
+            <ul>
+                <li>Haz clic en el botón "Comenzar" para iniciar la actividad</li>
+                <li>Encuentra las palabras relacionadas con IA y programación en la sopa de letras</li>
+                <li>Selecciona las palabras haciendo clic y arrastrando sobre ellas</li>
+                <li>Las palabras pueden estar en horizontal, vertical o diagonal</li>
+                <li>Intenta encontrar todas las palabras antes de que se acabe el tiempo.</li>
+                <li>¡Buena suerte!</li>
+            </ul>
+        </div>
+        
+        <div id="ardoraTab" style="visibility: hidden;"></div>
+    </div>
+    
+    <div id="ardoraAlumSCORM"><p></p></div>
+    <div id="ardoraAutor">
+        <p>Autor: Conan Rodríguez</p>
+    </div>
+
+
+</body>
+</html>
